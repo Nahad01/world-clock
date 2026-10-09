@@ -1,0 +1,260 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>World clock: Brantford, India, Dubai, New York</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Figtree:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#eef2f6;--ink:#14213d;--muted:#566176;--line:#d3d9e3;--panel:#fff;--accent:#0f7b84;--ok:#2e9e6a;
+--night:#1b2547;--night-ink:#e8ecff;--dawn:#6b79b3;--dawn-ink:#fff;--day:#fbe9a8;--day-ink:#3a2e05;--dusk:#e9a46a;--dusk-ink:#2e1805;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0d1322;--ink:#e8ecf5;--muted:#9aa5bd;--line:#29324f;--panel:#151c32;--accent:#4fc3cc}}
+:root[data-theme="dark"]{--bg:#0d1322;--ink:#e8ecf5;--muted:#9aa5bd;--line:#29324f;--panel:#151c32;--accent:#4fc3cc}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 16px/1.45 Figtree,system-ui,sans-serif}
+main{max-width:980px;margin:0 auto;padding:1.25rem 1rem 2.5rem}
+h1{font:700 clamp(1.5rem,5vw,2.1rem)/1.1 "Bricolage Grotesque",system-ui,sans-serif;margin:0 0 .3rem;letter-spacing:-.01em}
+.lead{margin:0 0 1rem;color:var(--muted);font-size:.92rem}
+.night{background:var(--night);color:var(--night-ink)}.dawn{background:var(--dawn);color:var(--dawn-ink)}
+.day{background:var(--day);color:var(--day-ink)}.dusk{background:var(--dusk);color:var(--dusk-ink)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:.6rem}
+.clock{position:relative;border-radius:16px;padding:.9rem .85rem .8rem;min-width:0;transition:background .5s,color .5s}
+.clock .rm{all:unset;position:absolute;top:.3rem;right:.4rem;cursor:pointer;font-size:1.2rem;line-height:1;opacity:.6;padding:.25rem}
+.clock .rm:hover{opacity:1}.clock .rm:focus-visible,.clock .apb:focus-visible{outline:2px solid currentColor}
+.city{font-weight:600;font-size:.95rem;padding-right:1.2rem}.sub{font-size:.75rem;opacity:.8}
+.t{display:flex;align-items:baseline;font:700 clamp(2rem,7vw,2.8rem)/1 "Bricolage Grotesque",system-ui,sans-serif;font-variant-numeric:tabular-nums;margin:.6rem 0 .2rem;letter-spacing:-.02em}
+.t .h,.t .m{cursor:ns-resize;touch-action:none;user-select:none;-webkit-user-select:none;border-radius:6px;padding:0 .05em;text-decoration:underline dotted;text-decoration-thickness:.04em;text-underline-offset:.14em}
+.t .h:hover,.t .m:hover,.t .h:focus-visible,.t .m:focus-visible{background:rgba(255,255,255,.28);outline:2px solid currentColor}
+.ap{font-size:.8rem;font-weight:600;min-height:1.6rem}.ap span{font-weight:400;opacity:.75;font-variant-numeric:tabular-nums}
+.clock .apb{all:unset;cursor:pointer;font-weight:600;font-size:.78rem;padding:.1rem .45rem;border:1px solid currentColor;border-radius:6px;margin-right:.35rem}
+.clock .apb[hidden]{display:none}
+.d{font-size:.82rem;font-weight:600;margin-top:.3rem}.df{font-size:.72rem;opacity:.85}
+.bar{position:relative;height:6px;border-radius:3px;margin-top:.7rem;border:1px solid rgba(255,255,255,.5);background:linear-gradient(90deg,var(--night) 0 20.8%,var(--dawn) 20.8% 33.3%,var(--day) 33.3% 75%,var(--dusk) 75% 87.5%,var(--night) 87.5%)}
+.bar i{position:absolute;top:-4px;width:12px;height:12px;margin-left:-6px;border-radius:50%;background:#fff;border:2px solid #14213d}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:1rem;margin-top:.9rem}
+.row{display:flex;gap:.6rem;flex-wrap:wrap;align-items:end}
+.f{display:grid;gap:.2rem;font-size:.78rem;color:var(--muted);font-weight:600}
+select,input[type=date],input[type=time]{font:600 .95rem Figtree,sans-serif;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:.45rem .6rem;min-height:42px}
+input[type=range]{width:100%;accent-color:var(--accent);margin:1rem 0 .3rem;min-height:32px}
+button{font:600 .9rem Figtree,sans-serif;background:var(--accent);color:#fff;border:0;border-radius:8px;padding:.55rem .9rem;min-height:40px;cursor:pointer}
+.ghost{background:var(--bg);color:var(--ink);border:1px solid var(--line)}
+button:focus-visible,tr:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.chips,.tools{display:flex;gap:.45rem;flex-wrap:wrap}.tools{margin-top:.8rem}
+#lbl{margin:.6rem 0 0;color:var(--muted);font-size:.88rem}
+.head{display:flex;justify-content:space-between;align-items:end;gap:.8rem;flex-wrap:wrap}
+h2{font:700 1.15rem "Bricolage Grotesque",system-ui,sans-serif;margin:0}
+.win{margin:.5rem 0 .7rem;font-size:.9rem;padding:.55rem .7rem;border-radius:8px;background:rgba(46,158,106,.14);border-left:5px solid var(--ok)}
+.wrap{max-height:min(58vh,520px);overflow:auto;border:1px solid var(--line);border-radius:12px;position:relative}
+table{width:100%;border-collapse:separate;border-spacing:0;min-width:320px}
+th{position:sticky;top:0;z-index:1;background:var(--panel);text-align:left;font-size:.82rem;padding:.6rem .7rem;border-bottom:1px solid var(--line)}
+th small{display:block;font-weight:400;color:var(--muted)}
+td{padding:.75rem .7rem;font:600 1.05rem "Bricolage Grotesque",system-ui,sans-serif;font-variant-numeric:tabular-nums;border-bottom:1px solid rgba(127,127,127,.18)}
+td small{font:600 .72rem Figtree,sans-serif}td em{display:block;font:400 .68rem Figtree,sans-serif;opacity:.8}
+tr{cursor:pointer}tr.ok td:first-child{border-left:6px solid var(--ok)}
+tr.now td{box-shadow:inset 0 3px 0 var(--accent),inset 0 -3px 0 var(--accent)}
+tr.now td:first-child{box-shadow:inset 0 3px 0 var(--accent),inset 0 -3px 0 var(--accent),inset 4px 0 0 var(--accent)}
+tr.now td:last-child{box-shadow:inset 0 3px 0 var(--accent),inset 0 -3px 0 var(--accent),inset -4px 0 0 var(--accent)}
+.legend{display:flex;gap:.6rem;font-size:.75rem;color:var(--muted);flex-wrap:wrap;margin:.6rem 0 0}
+.legend i{display:inline-block;width:.8rem;height:.8rem;border-radius:3px;margin-right:.25rem;vertical-align:-1px;border:1px solid var(--line)}
+.legend .okc{width:.3rem;border:0;border-left:6px solid var(--ok);border-radius:0}
+@media (prefers-reduced-motion:reduce){.clock{transition:none}}
+</style>
+</head>
+<body>
+<main>
+  <h1>World clock</h1>
+  <p class="lead">Change the time in one place and every city follows. Scroll, drag or use arrow keys on any hour or minute.</p>
+
+  <section class="grid" id="clocks"></section>
+
+  <section class="panel">
+    <div class="row">
+      <label class="f">Set the time in<select id="src"></select></label>
+      <label class="f">Date<input type="date" id="dt"></label>
+      <label class="f">Time<input type="time" id="tt"></label>
+    </div>
+    <input id="off" type="range" min="-1440" max="1440" step="15" value="0" aria-label="Move all clocks, 24 hours either way">
+    <div class="chips">
+      <button class="ghost" data-s="-1440" type="button">&minus;1 day</button>
+      <button class="ghost" data-s="-60" type="button">&minus;1 h</button>
+      <button id="now" type="button">Now</button>
+      <button class="ghost" data-s="60" type="button">+1 h</button>
+      <button class="ghost" data-s="1440" type="button">+1 day</button>
+    </div>
+    <p id="lbl"></p>
+  </section>
+
+  <section class="panel">
+    <div class="head">
+      <h2 id="cap">Every hour of the day</h2>
+      <label class="f">Count people as available<select id="aw"></select></label>
+    </div>
+    <p class="win" id="win"></p>
+    <div class="wrap" id="wrap"><table><thead><tr id="thr"></tr></thead><tbody id="tb"></tbody></table></div>
+    <div class="legend"><span><i class="night"></i>Night</span><span><i class="dawn"></i>Early</span><span><i class="day"></i>Day</span><span><i class="dusk"></i>Evening</span><span><i class="okc"></i>Everyone available</span></div>
+    <div class="tools">
+      <button id="next" type="button">Next time all are available</button>
+      <button id="copy" class="ghost" type="button">Copy all times</button>
+      <button id="fmt" class="ghost" type="button">24-hour clock</button>
+      <select id="add" aria-label="Add a city"></select>
+    </div>
+    <p class="lead" style="margin:.7rem 0 0">Tap a row to set every clock to that hour. Rows follow the first city's calendar day.</p>
+  </section>
+</main>
+
+<script>
+const CAT=[
+ {k:'to',n:'Canada',s:'Brantford',tz:'America/Toronto'},{k:'in',n:'India',s:'Kerala, IST',tz:'Asia/Kolkata'},
+ {k:'ae',n:'Dubai',s:'GST',tz:'Asia/Dubai'},{k:'ny',n:'U.S.',s:'New York',tz:'America/New_York'},
+ {k:'la',n:'U.S. West',s:'Los Angeles',tz:'America/Los_Angeles'},{k:'ch',n:'U.S. Central',s:'Chicago',tz:'America/Chicago'},
+ {k:'ld',n:'UK',s:'London',tz:'Europe/London'},{k:'pa',n:'France',s:'Paris',tz:'Europe/Paris'},
+ {k:'qa',n:'Qatar',s:'Doha',tz:'Asia/Qatar'},{k:'sa',n:'Saudi Arabia',s:'Riyadh',tz:'Asia/Riyadh'},
+ {k:'pk',n:'Pakistan',s:'Karachi',tz:'Asia/Karachi'},{k:'sg',n:'Singapore',s:'Singapore',tz:'Asia/Singapore'},
+ {k:'jp',n:'Japan',s:'Tokyo',tz:'Asia/Tokyo'},{k:'au',n:'Australia',s:'Sydney',tz:'Australia/Sydney'}
+];
+const AW=[{l:'Awake: 7 AM to 10 PM',a:7,b:22},{l:'Comfortable: 8 AM to 9 PM',a:8,b:21},{l:'Work hours: 9 AM to 6 PM',a:9,b:18}];
+const $=id=>document.getElementById(id),pad=n=>String(n).padStart(2,'0');
+const store={get(){try{return JSON.parse(localStorage.getItem('wc3')||'{}')}catch(e){return{}}},set(o){try{localStorage.setItem('wc3',JSON.stringify(o))}catch(e){}}};
+const saved=store.get();
+let Z=(Array.isArray(saved.c)?saved.c.map(k=>CAT.find(c=>c.k===k)).filter(Boolean):[]);
+if(!Z.length)Z=CAT.slice(0,4);
+let h24=!!saved.h,aw=AW[saved.a]?saved.a:0,fz=null,hold=false,curKey='',rows=[],mid=0,lastIdx=-1,C=[];
+const save=()=>store.set({c:Z.map(z=>z.k),h:h24,a:aw});
+const FM={};
+CAT.forEach(z=>FM[z.tz]={
+ p:new Intl.DateTimeFormat('en-US',{timeZone:z.tz,hourCycle:'h23',hour:'numeric',minute:'2-digit',second:'2-digit',year:'numeric',month:'2-digit',day:'2-digit'}),
+ d:new Intl.DateTimeFormat('en-US',{timeZone:z.tz,weekday:'short',month:'short',day:'numeric'})});
+function info(tz,t){
+ const f=FM[tz],d=new Date(t),p={};
+ f.p.formatToParts(d).forEach(x=>p[x.type]=x.value);
+ const h=(+p.hour)%24;
+ return{h,mi:+p.minute,s:+p.second,h12:(h%12)||12,mi2:pad(p.minute),ap:h<12?'AM':'PM',key:p.year+p.month+p.day,iso:p.year+'-'+p.month+'-'+p.day,date:f.d.format(d),ms:Date.UTC(+p.year,+p.month-1,+p.day,h,+p.minute)};
+}
+function toInstant(tz,y,mo,d,h,mi){const w=Date.UTC(y,mo-1,d,h,mi);let g=w;for(let k=0;k<2;k++)g=w-(info(tz,g).ms-g);return g}
+const bandOf=h=>(h>=21||h<5)?'night':h<8?'dawn':h<18?'day':'dusk';
+const ICON={night:'🌙',dawn:'🌅',day:'☀️',dusk:'🌇'};
+const avail=T=>Z.every(z=>{const h=info(z.tz,T).h;return h>=AW[aw].a&&h<AW[aw].b});
+const hm=a=>[a>=60?Math.floor(a/60)+' h':'',a%60?a%60+' min':''].filter(Boolean).join(' ')||'0 min';
+const cur=()=>fz??Date.now(),hh=x=>h24?pad(x.h):x.h12,tm=x=>hh(x)+':'+x.mi2,ft=x=>tm(x)+(h24?'':' '+x.ap);
+const wrap=$('wrap'),slider=$('off'),clocks=$('clocks'),src=$('src'),dt=$('dt'),tt=$('tt');
+
+function step(m){fz=(fz??Math.floor(Date.now()/6e4)*6e4)+m*6e4;sync()}
+function sync(){hold=false;slider.value=fz===null?0:Math.round((fz-Date.now())/6e4);render()}
+function spin(el,unit){
+ let acc=0,y=null,r=0;
+ el.addEventListener('wheel',e=>{e.preventDefault();acc+=e.deltaY;while(Math.abs(acc)>=40){step(-Math.sign(acc)*unit(e));acc-=Math.sign(acc)*40}},{passive:false});
+ el.addEventListener('pointerdown',e=>{y=e.clientY;r=0;el.setPointerCapture(e.pointerId)});
+ el.addEventListener('pointermove',e=>{if(y===null)return;const n=Math.trunc((y-e.clientY)/14);if(n!==r){step((n-r)*unit(e));r=n}});
+ const up=()=>{y=null};el.addEventListener('pointerup',up);el.addEventListener('pointercancel',up);
+ el.addEventListener('keydown',e=>{if(e.key==='ArrowUp'||e.key==='ArrowDown'){e.preventDefault();step((e.key==='ArrowUp'?1:-1)*unit(e))}});
+}
+function tiles(){
+ clocks.innerHTML=Z.map((z,i)=>`<div class="clock"><button class="rm" type="button" aria-label="Remove ${z.s}" ${i?'':'hidden'}>&times;</button><div class="city"><span class="ic"></span> ${z.n}</div><div class="sub">${z.s}</div><div class="t"><span class="h" role="spinbutton" tabindex="0" aria-label="${z.s} hour"></span>:<span class="m" role="spinbutton" tabindex="0" aria-label="${z.s} minute"></span></div><div class="ap"><button class="apb" type="button" aria-label="Switch ${z.s} between AM and PM"></button><span class="sec"></span></div><div class="d"></div><div class="df"></div><div class="bar"><i></i></div></div>`).join('');
+ C=[...clocks.children].map((el,i)=>{
+  const q=s=>el.querySelector(s),c={el,ic:q('.ic'),h:q('.h'),m:q('.m'),apb:q('.apb'),sec:q('.sec'),d:q('.d'),df:q('.df'),mk:q('.bar i')};
+  spin(c.h,()=>60);spin(c.m,e=>e.shiftKey?1:5);
+  c.apb.onclick=()=>step(720);
+  q('.rm').onclick=()=>{Z.splice(i,1);save();all()};
+  return c;
+ });
+}
+function all(){
+ const prev=Z[+src.value]?.tz;
+ tiles();
+ $('thr').innerHTML=Z.map(z=>`<th scope="col">${z.n}<small>${z.s}</small></th>`).join('');
+ src.innerHTML=Z.map((z,i)=>`<option value="${i}">${z.s}</option>`).join('');
+ const j=Z.findIndex(z=>z.tz===prev);src.value=j<0?0:j;
+ $('add').innerHTML=(Z.length>=6?'<option value="">Limit: 6 cities</option>':'<option value="">Add a city</option>')+CAT.filter(c=>!Z.includes(c)).map(c=>`<option value="${c.k}">${c.s} (${c.n})</option>`).join('');
+ $('add').disabled=Z.length>=6;
+ build(cur());render();
+}
+function build(t){
+ const H=Z[0].tz,c=info(H,t);
+ mid=Math.floor(t/1000)*1000-((c.h*60+c.mi)*60+c.s)*1000;
+ const tb=$('tb');tb.innerHTML='';rows=[];
+ for(let i=0;i<24;i++){
+  const T=mid+i*36e5,b=info(H,T),tr=document.createElement('tr');
+  tr.tabIndex=0;if(avail(T))tr.className='ok';
+  Z.forEach(z=>{
+   const x=info(z.tz,T),td=document.createElement('td');
+   td.className=bandOf(x.h);
+   td.innerHTML=tm(x)+(h24?'':` <small>${x.ap}</small>`)+(x.key!==b.key?`<em>${x.key>b.key?'next day':'previous day'}</em>`:'');
+   tr.appendChild(td);
+  });
+  tr.addEventListener('click',()=>{fz=T;sync()});
+  tr.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();tr.click()}});
+  tb.appendChild(tr);rows.push(tr);
+ }
+ const w=[];let s=null;
+ for(let i=0;i<=48;i++){const T=mid+i*18e5,ok=i<48&&avail(T);if(ok&&s===null)s=T;if(!ok&&s!==null){w.push([s,T]);s=null}}
+ $('win').textContent=w.length?'Everyone is available '+w.map(([a,b])=>ft(info(H,a))+' to '+ft(info(H,b))).join(' and ')+' in '+Z[0].s+'.':'No time on this day when everyone is available.';
+ curKey=c.key;lastIdx=-1;
+ $('cap').textContent='Every hour on '+c.date+' in '+Z[0].s;
+}
+function render(){
+ const t=cur(),c0=info(Z[0].tz,t);
+ Z.forEach((z,i)=>{
+  const x=info(z.tz,t),c=C[i],b=bandOf(x.h),d=Math.round((x.ms-c0.ms)/6e4);
+  c.el.className='clock '+b;c.ic.textContent=ICON[b];
+  c.h.textContent=hh(x);c.m.textContent=x.mi2;
+  c.h.setAttribute('aria-valuenow',x.h);c.m.setAttribute('aria-valuenow',x.mi);
+  c.apb.textContent=x.ap;c.apb.hidden=h24;
+  c.sec.textContent=fz===null?':'+pad(x.s):'';
+  c.d.textContent=x.date+(i&&x.key>c0.key?' (tomorrow)':i&&x.key<c0.key?' (yesterday)':'');
+  c.df.textContent=i===0?'Where you are':d===0?'Same time as '+Z[0].s:hm(Math.abs(d))+(d>0?' ahead':' behind');
+  c.mk.style.left=((x.h+x.mi/60)/24*100)+'%';
+ });
+ const z=Z[+src.value]||Z[0],xs=info(z.tz,t);
+ if(document.activeElement!==dt)dt.value=xs.iso;
+ if(document.activeElement!==tt)tt.value=pad(xs.h)+':'+xs.mi2;
+ if(c0.key!==curKey)build(t);
+ const idx=Math.floor((t-mid)/36e5);
+ rows.forEach((r,i)=>r.classList.toggle('now',i===idx));
+ if(idx!==lastIdx&&rows[idx]&&!hold){
+  const r=rows[idx],th=wrap.querySelector('th').offsetHeight;
+  wrap.scrollTo({top:Math.max(0,r.offsetTop-(wrap.clientHeight+th)/2+r.offsetHeight/2),behavior:lastIdx<0?'auto':'smooth'});
+ }
+ lastIdx=idx;
+ const dm=fz===null?0:Math.round((fz-Date.now())/6e4);
+ $('lbl').textContent=fz===null?'Showing the live time.':'Fixed time, '+(dm===0?'about now':hm(Math.abs(dm))+(dm>0?' from now':' ago'))+'. Tap Now to go back to live.';
+}
+function applySet(){
+ const d=dt.value.split('-').map(Number),t=tt.value.split(':').map(Number);
+ if(d.length<3||t.length<2||[...d,...t].some(isNaN))return;
+ fz=toInstant(Z[+src.value].tz,d[0],d[1],d[2],t[0],t[1]);sync();
+}
+dt.addEventListener('change',applySet);tt.addEventListener('change',applySet);
+src.addEventListener('change',render);
+slider.addEventListener('input',()=>{const v=+slider.value;hold=false;fz=v===0?null:Math.floor(Date.now()/6e4)*6e4+v*6e4;render()});
+document.querySelectorAll('[data-s]').forEach(b=>b.onclick=()=>step(+b.dataset.s));
+$('now').onclick=()=>{fz=null;sync()};
+$('aw').innerHTML=AW.map((a,i)=>`<option value="${i}">${a.l}</option>`).join('');$('aw').value=aw;
+$('aw').onchange=e=>{aw=+e.target.value;save();build(cur());render()};
+$('fmt').textContent=h24?'12-hour clock':'24-hour clock';
+$('fmt').onclick=e=>{h24=!h24;e.target.textContent=h24?'12-hour clock':'24-hour clock';save();build(cur());render()};
+$('add').onchange=e=>{const c=CAT.find(x=>x.k===e.target.value);if(c&&Z.length<6&&!Z.includes(c)){Z.push(c);save();all()}};
+$('next').onclick=()=>{
+ let T=Math.floor(cur()/18e5)*18e5+18e5;
+ for(let i=0;i<192;i++,T+=18e5){if(avail(T)&&!avail(T-18e5)){fz=T;sync();return}}
+ $('lbl').textContent='No time in the next 4 days when everyone is available. Try another availability setting.';
+};
+$('copy').onclick=async e=>{
+ const t=cur(),b=e.target;
+ const txt=Z.map(z=>{const x=info(z.tz,t);return `${z.n} (${z.s}): ${ft(x)}, ${x.date}`}).join('\n');
+ try{await navigator.clipboard.writeText(txt)}catch(_){
+  const a=document.createElement('textarea');a.value=txt;document.body.appendChild(a);a.select();
+  try{document.execCommand('copy')}catch(__){}a.remove();
+ }
+ b.textContent='Copied';setTimeout(()=>b.textContent='Copy all times',1500);
+};
+wrap.addEventListener('pointerdown',()=>{hold=true});
+wrap.addEventListener('wheel',()=>{hold=true},{passive:true});
+all();
+setInterval(()=>{if(fz===null)render()},1000);
+</script>
+</body>
+</html>
