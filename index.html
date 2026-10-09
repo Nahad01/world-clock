@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>World clock: Brantford, India, Dubai, New York</title>
+<title>World clock: Canada, India, Dubai, U.S.</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Figtree:wght@400;600&display=swap" rel="stylesheet">
@@ -100,7 +100,6 @@ tr.now td:last-child{box-shadow:inset 0 3px 0 var(--accent),inset 0 -3px 0 var(-
       <button id="next" type="button">Next time all are available</button>
       <button id="copy" class="ghost" type="button">Copy all times</button>
       <button id="fmt" class="ghost" type="button">24-hour clock</button>
-      <select id="add" aria-label="Add a city"></select>
     </div>
     <p class="lead" style="margin:.7rem 0 0">Tap a row to set every clock to that hour. Rows follow the first city's calendar day.</p>
   </section>
@@ -108,8 +107,8 @@ tr.now td:last-child{box-shadow:inset 0 3px 0 var(--accent),inset 0 -3px 0 var(-
 
 <script>
 const CAT=[
- {k:'to',n:'Canada',s:'Brantford',tz:'America/Toronto'},{k:'in',n:'India',s:'Kerala, IST',tz:'Asia/Kolkata'},
- {k:'ae',n:'Dubai',s:'GST',tz:'Asia/Dubai'},{k:'ny',n:'U.S.',s:'New York',tz:'America/New_York'},
+ {k:'to',n:'Canada',s:'Ontario',tz:'America/Toronto'},{k:'in',n:'India',s:'Kerala',tz:'Asia/Kolkata'},
+ {k:'ae',n:'Dubai',s:'UAE',tz:'Asia/Dubai'},{k:'ny',n:'U.S.',s:'New York',tz:'America/New_York'},
  {k:'la',n:'U.S. West',s:'Los Angeles',tz:'America/Los_Angeles'},{k:'ch',n:'U.S. Central',s:'Chicago',tz:'America/Chicago'},
  {k:'ld',n:'UK',s:'London',tz:'Europe/London'},{k:'pa',n:'France',s:'Paris',tz:'Europe/Paris'},
  {k:'qa',n:'Qatar',s:'Doha',tz:'Asia/Qatar'},{k:'sa',n:'Saudi Arabia',s:'Riyadh',tz:'Asia/Riyadh'},
@@ -120,8 +119,7 @@ const AW=[{l:'Awake: 7 AM to 10 PM',a:7,b:22},{l:'Comfortable: 8 AM to 9 PM',a:8
 const $=id=>document.getElementById(id),pad=n=>String(n).padStart(2,'0');
 const store={get(){try{return JSON.parse(localStorage.getItem('wc3')||'{}')}catch(e){return{}}},set(o){try{localStorage.setItem('wc3',JSON.stringify(o))}catch(e){}}};
 const saved=store.get();
-let Z=(Array.isArray(saved.c)?saved.c.map(k=>CAT.find(c=>c.k===k)).filter(Boolean):[]);
-if(!Z.length)Z=CAT.slice(0,4);
+const Z=CAT.slice(0,4);
 let h24=!!saved.h,aw=AW[saved.a]?saved.a:0,fz=null,hold=false,curKey='',rows=[],mid=0,lastIdx=-1,C=[];
 const save=()=>store.set({c:Z.map(z=>z.k),h:h24,a:aw});
 const FM={};
@@ -153,12 +151,11 @@ function spin(el,unit){
  el.addEventListener('keydown',e=>{if(e.key==='ArrowUp'||e.key==='ArrowDown'){e.preventDefault();step((e.key==='ArrowUp'?1:-1)*unit(e))}});
 }
 function tiles(){
- clocks.innerHTML=Z.map((z,i)=>`<div class="clock"><button class="rm" type="button" aria-label="Remove ${z.s}" ${i?'':'hidden'}>&times;</button><div class="city"><span class="ic"></span> ${z.n}</div><div class="sub">${z.s}</div><div class="t"><span class="h" role="spinbutton" tabindex="0" aria-label="${z.s} hour"></span>:<span class="m" role="spinbutton" tabindex="0" aria-label="${z.s} minute"></span></div><div class="ap"><button class="apb" type="button" aria-label="Switch ${z.s} between AM and PM"></button><span class="sec"></span></div><div class="d"></div><div class="df"></div><div class="bar"><i></i></div></div>`).join('');
+ clocks.innerHTML=Z.map((z,i)=>`<div class="clock"><div class="city"><span class="ic"></span> ${z.n}</div><div class="sub">${z.s}</div><div class="t"><span class="h" role="spinbutton" tabindex="0" aria-label="${z.s} hour"></span>:<span class="m" role="spinbutton" tabindex="0" aria-label="${z.s} minute"></span></div><div class="ap"><button class="apb" type="button" aria-label="Switch ${z.s} between AM and PM"></button><span class="sec"></span></div><div class="d"></div><div class="df"></div><div class="bar"><i></i></div></div>`).join('');
  C=[...clocks.children].map((el,i)=>{
   const q=s=>el.querySelector(s),c={el,ic:q('.ic'),h:q('.h'),m:q('.m'),apb:q('.apb'),sec:q('.sec'),d:q('.d'),df:q('.df'),mk:q('.bar i')};
   spin(c.h,()=>60);spin(c.m,e=>e.shiftKey?1:5);
   c.apb.onclick=()=>step(720);
-  q('.rm').onclick=()=>{Z.splice(i,1);save();all()};
   return c;
  });
 }
@@ -168,8 +165,6 @@ function all(){
  $('thr').innerHTML=Z.map(z=>`<th scope="col">${z.n}<small>${z.s}</small></th>`).join('');
  src.innerHTML=Z.map((z,i)=>`<option value="${i}">${z.s}</option>`).join('');
  const j=Z.findIndex(z=>z.tz===prev);src.value=j<0?0:j;
- $('add').innerHTML=(Z.length>=6?'<option value="">Limit: 6 cities</option>':'<option value="">Add a city</option>')+CAT.filter(c=>!Z.includes(c)).map(c=>`<option value="${c.k}">${c.s} (${c.n})</option>`).join('');
- $('add').disabled=Z.length>=6;
  build(cur());render();
 }
 function build(t){
@@ -236,7 +231,6 @@ $('aw').innerHTML=AW.map((a,i)=>`<option value="${i}">${a.l}</option>`).join('')
 $('aw').onchange=e=>{aw=+e.target.value;save();build(cur());render()};
 $('fmt').textContent=h24?'12-hour clock':'24-hour clock';
 $('fmt').onclick=e=>{h24=!h24;e.target.textContent=h24?'12-hour clock':'24-hour clock';save();build(cur());render()};
-$('add').onchange=e=>{const c=CAT.find(x=>x.k===e.target.value);if(c&&Z.length<6&&!Z.includes(c)){Z.push(c);save();all()}};
 $('next').onclick=()=>{
  let T=Math.floor(cur()/18e5)*18e5+18e5;
  for(let i=0;i<192;i++,T+=18e5){if(avail(T)&&!avail(T-18e5)){fz=T;sync();return}}
